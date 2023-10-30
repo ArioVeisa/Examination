@@ -15,6 +15,7 @@ use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\RegisController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,6 +31,12 @@ use App\Http\Controllers\PermissionController;
 Route::get('/', function () {
     return view('auth.login');
 });
+Route::get('/forgot', function () {
+    return view('auth.reset');
+});
+Route::get('/signup', [RegisController::class,  'index']);
+Route::post('/signup', [RegisController::class,  'store']);
+Route::post('/signup', [RegisController::class,  'store']);
 
 Auth::routes(['register' => false]);
 
@@ -89,6 +96,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::resource('exams', ExamController::class);
     Route::get('/exams/result/{score}/{user_id}/{exam_id}', [ExamController::class, 'result'])->name('exams.result');
+    Route::get('/exams/scoreboard/{exam}', [ExamController::class, 'scoreboard'])->name('exams.scoreboard');
     Route::get('/exams/start/{id}', [ExamController::class, 'start'])->name('exams.start');
     Route::get('exams/student/{id}', [ExamController::class, 'student'])->name('exams.student');
     Route::put('exams/assign/{id}', [ExamController::class, 'assign'])->name('exams.assign');

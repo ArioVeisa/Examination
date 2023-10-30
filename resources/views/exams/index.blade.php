@@ -69,17 +69,41 @@
                                     <td>{{ TanggalID($exam->start) }}</td>
                                     <td>{{ TanggalID($exam->end) }}</td>
                                     <td class="text-center">
-                                        <a href="{{ route('exams.show', $exam->id) }}" class="btn btn-sm btn-info">
-                                            <i class="fa fa-eye"></i>
-                                        </a>
+                                        @hasrole('student')
+                                            @if ($user->getScore(Auth()->id(), $exam->id) == null)
+                                                <a href="{{ route('exams.show', $exam->id) }}" class="btn btn-sm btn-info">
+                                                    <i class="fa fa-eye"></i>
+                                                </a>
+                                            @endif
+                                        @endhasrole
+                                        @hasrole('teacher|admin')
+                                            
+                                                <a href="{{ route('exams.show', $exam->id) }}" class="btn btn-sm btn-info">
+                                                    <i class="fa fa-eye"></i>
+                                                </a>
+                                            
+                                        @endhasrole
                                         @can('exams.edit')
                                             <a href="{{ route('exams.edit', $exam->id) }}" class="btn btn-sm btn-primary">
                                                 <i class="fa fa-pencil-alt"></i>
                                             </a>
                                         @endcan
+                                        @can('exams.edit')
+                                            <a href="{{ route('exams.scoreboard', $exam->id) }}" class="btn btn-sm btn-primary">
+                                                <i class="fa fa-archive"></i>
+                                            </a>
+                                        @endcan
                                         
                                         @hasanyrole('teacher|admin')
-                                        <a href="{{ route('exams.student', $exam->id) }}" class="btn btn-sm btn-primary">
+                                        @php
+                                            // Convert $exam->end to Carbon 
+                                            $carbonExamEnd = \Carbon\Carbon::parse($exam->end);
+                                            // Check if Exam Finish
+                                            $isExamFinish = now()->greaterThan($carbonExamEnd);
+                                            // Define Route Name
+                                            $routeName = $isExamFinish ? 'exams.scoreboard' : 'exams.student';
+                                        @endphp
+                                        <a href="{{ route($routeName, $exam->id) }}" class="btn btn-sm btn-primary">
                                             <i class="fa fa-door-open"></i>
                                         </a>
                                         @endhasanyrole
