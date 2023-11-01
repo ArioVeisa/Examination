@@ -6,30 +6,29 @@
             </div>
             <div class="col-12">
                 <!-- Display the countdown timer in an element -->
-                <span class="bg-danger p-1 text-white rounded" id="timer"></span>
+                <span class="badge badge-danger" id="timer" style="white-space:pre-wrap"></span>
             </div>
         </div>
     </div>
     @foreach ($questions as $question)
-    <div class="card-body w-100">
+    <div class="card-body overflow-hidden">
         <b>Soal No. {{ $questions->currentPage() }}</b>
         <p>{{ $question['detail'] }}</p>
-        <div class="box-satu w-100">
+        <div class="box-satu" style="overflow-x: auto">
             @if ($question['video_id'])
-                <video width="320" height="240" controls src="{{ Storage::url('public/videos/'.$video->getLink($question['video_id'])) }}" type="video/mp4">
-                    {{-- <source src="{{ Storage::url('public/videos/'.$video->getLink($question['video_id'])) }}" type="video/mpeg"> --}}
+                <video width="320" height="240" controls>
+                    <source src="{{ Storage::url('public/videos/'.$video->getLink($question['video_id'])) }}" type="video/mp4">
+                    <source src="{{ Storage::url('public/videos/'.$video->getLink($question['video_id'])) }}" type="video/mpeg">
                 </video>
             @elseif($question['audio_id'])
-            <div>
-                <audio controls src="{{ Storage::url('public/audios/'.$audio->getLink($question['audio_id'])) }}" type="audio/mp3">
-                    
-                    {{-- <source src="{{ Storage::url('public/audios/'.$audio->getLink($question['audio_id'])) }}" type="audio/wav"> --}}
+                <audio width="100px" height="12px" controls>
+                    <source src="{{ Storage::url('public/audios/'.$audio->getLink($question['audio_id'])) }}" type="audio/mp3">
+                    <source src="{{ Storage::url('public/audios/'.$audio->getLink($question['audio_id'])) }}" type="audio/wav">
                 </audio>
-            </div>
             @elseif($question['document_id'])
                 <a href=" {{ Storage::url('public/documents/'.$document->getLink($question['document_id'])) }}">DOCUMENT</a>
             @elseif($question['image_id'])
-            <img src="{{ Storage::url('public/images/'.$image->getLink($question['image_id'])) }}" class="w-50">
+            <img src="{{ Storage::url('public/images/'.$image->getLink($question['image_id'])) }}" class="w-100">
             @else
                 NO
             @endif
@@ -37,22 +36,22 @@
         <br>
         <i>Pilih salah satu jawaban dibawah ini:</i> 
         <br>
-        <div class="btn-group-vertical"  style="display: flex; flex-wrap: wrap; width: 100%;" role="group" aria-label="Basic example w-100 ">
+        <div class="btn-group-vertical" role="group" aria-label="Basic example w-100 ">
             <div>
-                <button type="button" class="mb-1 text-break {{ in_array($question['id'].'-'.$question['option_A'], $selectedAnswers) ? 'btn-success border border-secondary rounded' : 'btn-light border border-secondary rounded' }}"
-                wire:click="answers({{ $question['id'] }}, '{{ $question['option_A'] }}')"><p class="text-left"><b> A. {{ $question['option_A'] }} </b></p></button>
+                <button type="button" class="mb-1 text-break {{ in_array($question['id'].'-'.$question['option_A'], $selectedAnswers) ? 'btn btn-success border border-secondary rounded' : 'btn btn-light border border-secondary rounded' }}"
+                wire:click="answers({{ $question['id'] }}, '{{ $question['option_A'] }}')" style="white-space:pre-wrap"><p class="text-left"><b> A. {{ $question['option_A'] }} </b></p></button>
+            </div>
+            <div class="w-full">
+                <button type="button" class="mb-1 {{ in_array($question['id'].'-'.$question['option_B'], $selectedAnswers) ? 'btn btn-success border border-secondary rounded' : 'btn btn-light border border-secondary rounded' }}"
+                wire:click="answers({{ $question['id'] }}, '{{ $question['option_B'] }}')" style="white-space:pre-wrap"><p class="text-left"><b> B. {{ $question['option_B'] }} </b></p></button>
             </div>
             <div>
-                <button type="button" class="mb-1 {{ in_array($question['id'].'-'.$question['option_B'], $selectedAnswers) ? 'btn-success border border-secondary rounded' : ' btn-light border border-secondary rounded' }}"
-                wire:click="answers({{ $question['id'] }}, '{{ $question['option_B'] }}')"><p class="text-left"><b> B. {{ $question['option_B'] }} </b></p></button>
+                <button type="button" class="mb-1 {{ in_array($question['id'].'-'.$question['option_C'], $selectedAnswers) ? 'btn btn-success border border-secondary rounded' : 'btn btn-light border border-secondary rounded' }}"
+                wire:click="answers({{ $question['id'] }}, '{{ $question['option_C'] }}')" style="white-space:pre-wrap"><p class="text-left"><b> C. {{ $question['option_C'] }} </b></p></button>
             </div>
             <div>
-                <button type="button" class="mb-1 {{ in_array($question['id'].'-'.$question['option_C'], $selectedAnswers) ? 'btn-success border border-secondary rounded' : 'btn-light border border-secondary rounded' }}"
-                wire:click="answers({{ $question['id'] }}, '{{ $question['option_C'] }}')"><p class="text-left"><b> C. {{ $question['option_C'] }} </b></p></button>
-            </div>
-            <div>
-                <button type="button" class="mb-1 {{ in_array($question['id'].'-'.$question['option_D'], $selectedAnswers) ? 'btn-success border border-secondary rounded' : 'btn-light border border-secondary rounded' }}"
-                wire:click="answers({{ $question['id'] }}, '{{ $question['option_D'] }}')"><p class="text-left"><b> D. {{ $question['option_D'] }} </b></p></button>
+                <button type="button" class="mb-1 {{ in_array($question['id'].'-'.$question['option_D'], $selectedAnswers) ? 'btn btn-success border border-secondary rounded' : 'btn btn-light border border-secondary rounded' }}"
+                wire:click="answers({{ $question['id'] }}, '{{ $question['option_D'] }}')" style="white-space:pre-wrap"><p class="text-left"><b> D. {{ $question['option_D'] }} </b></p></button>
             </div>
             
         </div>
@@ -73,8 +72,17 @@
         @endif
     </div>
 </div>
-
+@livewireScripts
 <script>
+    Livewire.on('pageChanged', () => {
+        // Hentikan pemutaran audio saat halaman berubah
+        const audioElements = document.querySelectorAll('audio');
+        audioElements.forEach(audioElement => {
+            audioElement.pause();
+            audioElement.load();
+        });
+    });
+
     var add_minutes =  function (dt, minutes) {
     return new Date(dt.getTime() + minutes*60000);
     }
